@@ -17,33 +17,41 @@ class FieldManager:
         for _ in range(self.__bombs):
             while True:
                 x, y = randrange(self.__width), randrange(self.__width)
+                x += 1
+                y += 1
                 if f'{x}, {y}' not in self.__bomb_chords:
                     self.__bomb_chords.append(f'{x}, {y}')
                     break
 
         #gerar matriz
-        for x in range(self.__width):
+        for y in range(self.__width):
             self.__field.append([])
             for _ in range(self.__width):
-                self.__field[x].append('')
+                self.__field[y].append('')
 
         #posicionar bombas
-        for x in range(self.__width):
-            for y in range(self.__width):
-                if f'{x}, {y}' in self.__bomb_chords:
-                    self.__field[x][y] = 'X'
+        #são posicionadas usando coordenadas do plano cartesiano, lógica um pouco confusa
+        for visual_x in range(1, self.__width + 1):
+            visual_y = 1
+            real_y = self.__width - 1
+            while visual_y < self.__width + 1:
+                if f'{visual_x}, {visual_y}' in self.__bomb_chords:
+                    self.__field[real_y][visual_x - 1] = 'X'
+
+                real_y -= 1
+                visual_y += 1
 
         #gerar demais tiles
-        for x in range(self.__width):
-            for y in range(self.__width):
-                if self.__field[x][y] == 'X':
+        for y in range(self.__width):
+            for x in range(self.__width):
+                if self.__field[y][x] == 'X':
                     continue
                 
-                #descobrir número
+                #descobrir número do tile
                 bombs = 0
                 for a in range(-1, 2):
                     for b in range(-1, 2):
-                        if 0 <= x + a < self.__width and 0 <= y + b < self.__width and self.__field[x + a][y + b] == 'X':
+                        if 0 <= y + a < self.__width and 0 <= x + b < self.__width and self.__field[y + a][x + b] == 'X':
                             bombs += 1
 
 
@@ -80,7 +88,8 @@ class FieldManager:
 
         return f_str
 
-field = FieldManager(10, 20)
-field.generate()
+if __name__ == '__main__':
+    field = FieldManager(10, 4)
+    field.generate()
 
-print(field)
+    print(field)
