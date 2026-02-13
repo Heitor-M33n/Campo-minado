@@ -8,10 +8,24 @@ class FieldManager:
         self.__bombs = int(round(self.__density * self.__size))
         self.__bomb_chords = []
         self.__field = []
+        self.__play_field = []
 
     def __repr__(self) -> str:
-        return f'width: {self.width}\nsize: {self.size}\ndensity: {self.density}\nbombs: {self.bombs}\n{self.bomb_chords}\nCampo:\n{self.field}'
+        return f'width: {self.__width}\nsize: {self.__size}\ndensity: {self.__density}\nbombs: {self.__bombs}\n{self.__bomb_chords}\nCampo:\n{self.__real_field_repr}\nCampo em jogo:\n{self.play_field}'
     
+    def play(self) -> None:
+        playing = True
+        while playing:
+            print(self.play_field)
+
+            try:
+                x = int(input('x: ').strip())
+                y = int(input('y: ').strip())
+            except ValueError:
+                continue
+
+            playing = self.guess(x, y)
+
     def generate(self):
         #gerar coordenadas
         for _ in range(self.__bombs):
@@ -60,6 +74,32 @@ class FieldManager:
 
                 self.__field[y][x] = str(bombs)
 
+        #gerar matriz com tiles escondidos
+        for y in range(self.__width):
+            self.__play_field.append([])
+            for _ in range(self.__width):
+                self.__play_field[y].append('?')
+
+    def guess(self, x: int, y: int) -> bool:
+        #coordenadas visuais, n reais
+        real_y = self.__width - y
+        real_x = x - 1
+        tile = self.__field[real_y][real_x]
+
+        if tile == 'X':
+            self.game_over()
+            return False
+        elif tile != '0':
+            self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
+            return True
+        
+        self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
+        return True
+
+    def game_over(self) -> None:
+        #fazer uma animação top, do campo revelando em cascata
+        print('\nGame over\n')
+
     @property
     def width(self) -> int:
         return self.__width
@@ -77,19 +117,39 @@ class FieldManager:
         return self.__bombs
     
     @property
-    def bomb_chords(self) -> list:
-        return self.__bomb_chords
-    
-    @property
-    def field(self) -> str:
+    def play_field(self) -> str:
         f_str = ''
-        for row in self.__field:
-            f_str += str(row) + '\n'
+        y = self.__width
 
-        return f_str
+        for row in self.__play_field:
+            gap = ' ' if y < 10 else ''
+            f_str += gap + str(y) + ' '  + str(row) + '\n'
+            y -= 1
+
+        f_str += '     1'
+        for x in range(2, self.__width + 1):
+            f_str += '    ' + str(x)
+
+        return '\n' + f_str
+
+    @property
+    def __real_field_repr(self) -> str:
+        f_str = ''
+        y = self.__width
+
+        for row in self.__field:
+            gap = ' ' if y < 10 else ''
+            f_str += gap + str(y) + ' '  + str(row) + '\n'
+            y -= 1
+
+        f_str += '     1'
+        for x in range(2, self.__width + 1):
+            f_str += '    ' + str(x)
+
+        return '\n' + f_str
 
 if __name__ == '__main__':
-    field = FieldManager(10, 4)
-    field.generate()
+    game = FieldManager(10, 20)
+    game.generate()
 
-    print(field)
+    game.play()
