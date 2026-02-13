@@ -24,6 +24,10 @@ class FieldManager:
             except ValueError:
                 continue
 
+            if x > self.width or y > self.width:
+                print('out of range')
+                continue
+            
             playing = self.guess(x, y)
 
     def generate(self):
@@ -151,5 +155,6 @@ class FieldManager:
 if __name__ == '__main__':
     game = FieldManager(10, 20)
     game.generate()
+
 
     game.play()
