@@ -58,7 +58,7 @@ class FieldManager:
                 if bombs == 0:
                     bombs = ' '
 
-                self.__field[x][y] = str(bombs)
+                self.__field[y][x] = str(bombs)
 
     @property
     def width(self) -> int:
