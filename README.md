@@ -6,7 +6,7 @@ tentar implementar uma versão usando pygame ou alguma biblioteca de interface
 ## como testar?
 
 ```cmd
-git clone https://github.com/Heitor-M33n/Campo-minado/tree/main
+git clone https://github.com/Heitor-M33n/Campo-minado
 cd campo-minado
 library.py
 ```
