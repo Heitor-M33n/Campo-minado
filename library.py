@@ -1,32 +1,89 @@
 from random import randrange
+from time import sleep
+
+from rich.console import Console
+from rich.prompt import Prompt
+from rich.table import Table
+from rich.text import Text
+from rich import box
+
+console = Console()
 
 class FieldManager:
-    def __init__(self, width: int, density_percentage: int) -> None:
-        self.__width = width #height também
-        self.__size = width * width
-        self.__density = density_percentage / 100 #forma decimal
-        self.__bombs = int(round(self.__density * self.__size))
+    def __init__(self) -> None:
+        self.clear()
+
+    def __repr__(self) -> str:
+        return f'difficulty: {self.__difficulty}\nwidth: {self.__width}\nsize: {self.__size}\ndensity: {self.__density}\nbombs: {self.__bombs}\nbomb_chords: {self.__bomb_chords}\nfield:\n{self.__field}\nplay_field:\n{self.play_field}'
+    
+    def play(self) -> None:
+        playing = True
+
+        while playing:
+            console.clear()
+            console.print(self.play_field_rich)
+
+            if self.__field == self.__play_field:
+                self.win()
+
+            x = int(Prompt.ask('Insira a coordenada X', choices=list(str(item) for item in range(1, self.__width + 1)), show_choices=False))
+            y = int(Prompt.ask('Insira a coordenada Y', choices=list(str(item) for item in range(1, self.__width + 1)), show_choices=False))
+
+            playing = self.guess(x, y)
+
+        console.clear()
+        console.print(self.play_field_rich)
+        self.game_over()
+
+    def guess(self, x: int, y: int) -> bool:
+        #coordenadas visuais, n reais
+        real_y = self.__width - y
+        real_x = x - 1
+        tile = self.__field[real_y][real_x]
+
+        if tile == 'X':
+            self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
+            return False
+        elif tile != ' ':
+            self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
+            return True
+        
+        self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
+        return True
+
+    def game_over(self) -> None:
+        #fazer uma animação top, do campo revelando em cascata
+        console.print('\nGame over\n')
+
+    def win(self) -> None:
+        console.print('\nVocê venceu!\n')
+
+    def clear(self) -> None:
+        self.__difficulty = ''
+        self.__width = 0
+        self.__size = 0
+        self.__density = 0
+        self.__bombs = 0
         self.__bomb_chords = []
         self.__field = []
         self.__play_field = []
 
-    def __repr__(self) -> str:
-        return f'width: {self.__width}\nsize: {self.__size}\ndensity: {self.__density}\nbombs: {self.__bombs}\n{self.__bomb_chords}\nCampo:\n{self.__real_field_repr}\nCampo em jogo:\n{self.play_field}'
-    
-    def play(self) -> None:
-        playing = True
-        while playing:
-            print(self.play_field)
+    def generate(self, width: int = 0, density_percentage: int = 0, difficulty: str = ''):
+        DIFF_CHART = {'fácil': (5, 15), 'médio': (8, 20), 'difícil': (10, 25), 'insano': (15, 35)} 
+        self.clear()
 
-            try:
-                x = int(input('x: ').strip())
-                y = int(input('y: ').strip())
-            except ValueError:
-                continue
+        if not difficulty:
+            self.__width = width
+            self.__density = density_percentage / 100
+            self.__difficulty = 'personalizado'
+        else:
+            self.__width = DIFF_CHART[difficulty][0]
+            self.__density = DIFF_CHART[difficulty][1] / 100
+            self.__difficulty = difficulty
 
-            playing = self.guess(x, y)
+        self.__size = self.__width * self.__width
+        self.__bombs = int(round(self.__density * self.__size))
 
-    def generate(self):
         #gerar coordenadas
         for _ in range(self.__bombs):
             while True:
@@ -80,26 +137,6 @@ class FieldManager:
             for _ in range(self.__width):
                 self.__play_field[y].append('?')
 
-    def guess(self, x: int, y: int) -> bool:
-        #coordenadas visuais, n reais
-        real_y = self.__width - y
-        real_x = x - 1
-        tile = self.__field[real_y][real_x]
-
-        if tile == 'X':
-            self.game_over()
-            return False
-        elif tile != '0':
-            self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
-            return True
-        
-        self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
-        return True
-
-    def game_over(self) -> None:
-        #fazer uma animação top, do campo revelando em cascata
-        print('\nGame over\n')
-
     @property
     def width(self) -> int:
         return self.__width
@@ -115,41 +152,61 @@ class FieldManager:
     @property
     def bombs(self) -> int:
         return self.__bombs
+
+    @property
+    def difficulty(self) -> str:
+        return self.__difficulty
+
+    @property
+    def play_field(self) -> list:
+        return self.__play_field
     
     @property
-    def play_field(self) -> str:
-        f_str = ''
-        y = self.__width
+    def play_field_rich(self) -> Table:
+        COLORS = {'?': 'grey_70', 'X': 'bright_red', ' ': 'white', '1': 'blue', '2': 'green', '3': 'red', '4': 'dark_blue', '5': 'dark_red', '6': 'cyan', '7': 'grey_60', '8': 'grey_50'}
 
-        for row in self.__play_field:
-            gap = ' ' if y < 10 else ''
-            f_str += gap + str(y) + ' '  + str(row) + '\n'
-            y -= 1
+        table = Table(title=self.__difficulty, box=box.HEAVY_EDGE, show_header=False, show_lines=True)
 
-        f_str += '     1'
-        for x in range(2, self.__width + 1):
-            f_str += '    ' + str(x)
+        for i in range(self.__width):
+            y = Text(str(self.__width - i), '')
+            row = list(Text(str(item), f'{COLORS[item]}') for item in self.__play_field[i])
 
-        return '\n' + f_str
+            table.add_row(y, *row)
+
+        x = list(Text(str(item)) for item in range(self.__width + 1))
+        table.add_row(*x)
+
+        return table
 
     @property
-    def __real_field_repr(self) -> str:
-        f_str = ''
-        y = self.__width
+    def _bomb_chords(self) -> list:
+        return self.__bomb_chords
 
-        for row in self.__field:
-            gap = ' ' if y < 10 else ''
-            f_str += gap + str(y) + ' '  + str(row) + '\n'
-            y -= 1
+    @property
+    def _field(self) -> list:
+        return self.__field
+    
+    @property
+    def _field_rich(self) -> Table:
+        COLORS = {'?': 'grey_70', 'X': 'bright_red', ' ': 'white', '1': 'blue', '2': 'green', '3': 'red', '4': 'dark_blue', '5': 'dark_red', '6': 'cyan', '7': 'grey_60', '8': 'grey_50'}
 
-        f_str += '     1'
-        for x in range(2, self.__width + 1):
-            f_str += '    ' + str(x)
+        table = Table(title=self.__difficulty, box=box.HEAVY_EDGE, show_header=False, show_lines=True)
 
-        return '\n' + f_str
+        for i in range(self.__width):
+            y = Text(str(self.__width - i), '')
+            row = list(Text(str(item), f'{COLORS[item]}') for item in self.__field[i])
+
+            table.add_row(y, *row)
+
+        x = list(Text(str(item)) for item in range(self.__width + 1))
+        table.add_row(*x)
+
+        return table
 
 if __name__ == '__main__':
-    game = FieldManager(10, 20)
-    game.generate()
+    with console.status("Carregando...", spinner="aesthetic"):
+        fm = FieldManager()
+        fm.generate(difficulty='difícil')
 
-    game.play()
+    console.rule('Minesweeper', characters='=')
+    fm.play()
