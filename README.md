@@ -5,14 +5,12 @@ melhorias para melhorar a experiência do usuário
 
 # Campo-minado 💥
 
-Pequeno jogo de campo minado. A ideia original é fazer uma versão de terminal com rich  
-e depois implementar uma versão usando pygame, que será a principal
+Pequeno jogo de campo minado de terminaol com rich  
 
 ## Bibliotecas que serão usadas:
 - time 🕑
 - random 🎲
 - rich 💰
-- pygame 🎮
 
 ## como testar?
 
