@@ -21,5 +21,3 @@ git clone https://github.com/Heitor-M33n/Campo-minado
 cd campo-minado
 library.py
 ```
-
-(não recomendo por enquanto, visibilidade horrível)
