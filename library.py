@@ -274,13 +274,24 @@ class FieldManager:
         table.add_row(*x)
 
         return table
-
-if __name__ == '__main__':
+    
+def testes():
     with console.status("Carregando...", spinner="aesthetic"):
         fm = FieldManager()
+        fm.generate(difficulty='médio')
+        sleep(1.3)
 
     console.rule('Minesweeper', characters='=')
+    sleep(0.5)
+
+    console.rule('Nova rodada', characters='-')
+    fm.play()
+
     while True:
         fm.generate(difficulty='médio')
         console.rule('Nova rodada', characters='-')
         fm.play()
+
+
+if __name__ == '__main__':
+    testes()
