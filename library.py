@@ -18,38 +18,78 @@ class FieldManager:
     
     def play(self) -> None:
         playing = True
+        mode = 'guess'
+
+        console.print(self.play_field_rich)
 
         while playing:
-            console.clear()
-            console.print(self.play_field_rich)
-
-            if self.__field == self.__play_field:
-                self.win()
-
+            mode = Prompt.ask('Modo?', choices=('flag', 'guess'), default=mode)
             x = int(Prompt.ask('Insira a coordenada X', choices=list(str(item) for item in range(1, self.__width + 1)), show_choices=False))
             y = int(Prompt.ask('Insira a coordenada Y', choices=list(str(item) for item in range(1, self.__width + 1)), show_choices=False))
 
-            playing = self.guess(x, y)
+            playing = self.guess(x, y, mode)
 
-        console.clear()
-        console.print(self.play_field_rich)
-        self.game_over()
+            console.clear()
+            console.print(self.play_field_rich)
 
-    def guess(self, x: int, y: int) -> bool:
-        #coordenadas visuais, n reais
-        real_y = self.__width - y
-        real_x = x - 1
+            if self._flagged_blanks_play_field == self._flagged_field:
+                self.win()
+                break
+
+        if not playing:
+            self.game_over()
+
+    def guess(self, visual_x: int, visual_y: int, mode: str) -> bool:
+        real_y = self.__width - visual_y
+        real_x = visual_x - 1
         tile = self.__field[real_y][real_x]
 
-        if tile == 'X':
-            self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
-            return False
-        elif tile != ' ':
-            self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
+        if self.__play_field[real_y][real_x] not in ('🚩', '?'):
+            return True
+
+        if mode == 'guess':
+            if tile == 'X':
+                self.__play_field[real_y][real_x] = '💣'
+                return False
+            elif tile != ' ':
+                self.__play_field[real_y][real_x] = tile
+                return True
+            
+            blank_tiles = [[real_y, real_x]]
+            appended = True
+            while appended:
+                appended = False
+
+                for y, x in blank_tiles:
+                    for i in range(-1, 2):
+                        if y + i in range(0, self.__width) and self.__field[y + i][x] == ' ' and ([y + i, x] not in blank_tiles):
+                            blank_tiles.append([y + i, x])
+                            appended = True
+                        elif x + i in range(0, self.__width) and self.__field[y][x + i] == ' ' and [y, x + i] not in blank_tiles:
+                            blank_tiles.append([y, x + i])
+                            appended = True
+
+            close_tiles = []
+            for y, x in blank_tiles:
+                for i in range(-1, 2):
+                    for c in range(-1, 2):
+                        if y + i in range(0, self.__width) and x + c in range(0, self.__width) and [y + i, x + c] not in blank_tiles and [y + i, x + c] not in close_tiles:
+                            close_tiles.append([y + i, x + c])
+
+            for y, x in blank_tiles + close_tiles:
+                self.__play_field[y][x] = self.__field[y][x]
+
             return True
         
-        self.__play_field[real_y][real_x] = self.__field[real_y][real_x]
-        return True
+        elif mode == 'flag':
+            if self.__play_field[real_y][real_x] == '🚩':
+                self.__play_field[real_y][real_x] = '?'
+            elif self.__play_field[real_y][real_x] != '?':
+                pass
+            else:
+                self.__play_field[real_y][real_x] = '🚩'
+
+            return True
 
     def game_over(self) -> None:
         #fazer uma animação top, do campo revelando em cascata
@@ -163,7 +203,7 @@ class FieldManager:
     
     @property
     def play_field_rich(self) -> Table:
-        COLORS = {'?': 'grey_70', 'X': 'bright_red', ' ': 'white', '1': 'blue', '2': 'green', '3': 'red', '4': 'dark_blue', '5': 'dark_red', '6': 'cyan', '7': 'grey_60', '8': 'grey_50'}
+        COLORS = {'💣': '', '🚩': '', '?': 'grey_70', 'X': 'bright_red', ' ': 'white', '1': 'blue', '2': 'green', '3': 'red', '4': 'dark_blue', '5': 'dark_red', '6': 'cyan', '7': 'grey_60', '8': 'grey_50'}
 
         table = Table(title=self.__difficulty, box=box.HEAVY_EDGE, show_header=False, show_lines=True)
 
@@ -187,8 +227,40 @@ class FieldManager:
         return self.__field
     
     @property
+    def _flagged_field(self) -> list:
+        flagged_field = []
+
+        for r in self.__field:
+            row = []
+
+            for item in r:
+                if item == 'X':
+                    item = '🚩'
+                row.append(item)
+
+            flagged_field.append(row)
+
+        return flagged_field
+    
+    @property
+    def _flagged_blanks_play_field(self) -> list:
+        flagged_field = []
+
+        for r in self.__play_field:
+            row = []
+
+            for item in r:
+                if item == '?':
+                    item = '🚩'
+                row.append(item)
+
+            flagged_field.append(row)
+
+        return flagged_field
+    
+    @property
     def _field_rich(self) -> Table:
-        COLORS = {'?': 'grey_70', 'X': 'bright_red', ' ': 'white', '1': 'blue', '2': 'green', '3': 'red', '4': 'dark_blue', '5': 'dark_red', '6': 'cyan', '7': 'grey_60', '8': 'grey_50'}
+        COLORS = {'💣': '', '🚩': '', '?': 'grey_70', 'X': 'bright_red', ' ': 'white', '1': 'blue', '2': 'green', '3': 'red', '4': 'dark_blue', '5': 'dark_red', '6': 'cyan', '7': 'grey_60', '8': 'grey_50'}
 
         table = Table(title=self.__difficulty, box=box.HEAVY_EDGE, show_header=False, show_lines=True)
 
@@ -206,7 +278,9 @@ class FieldManager:
 if __name__ == '__main__':
     with console.status("Carregando...", spinner="aesthetic"):
         fm = FieldManager()
-        fm.generate(difficulty='difícil')
 
     console.rule('Minesweeper', characters='=')
-    fm.play()
+    while True:
+        fm.generate(difficulty='médio')
+        console.rule('Nova rodada', characters='-')
+        fm.play()
