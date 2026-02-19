@@ -1,26 +1,51 @@
-# * Em desenvolvimento...
-
-O jogo está minimamente operacional, mas necessita de muitas  
-mudanças para melhorar a experiência do usuário
-
+### 🚧 Em desenvolvimento... 🚧
 # Campo-minado 💥
 
-Pequeno jogo de campo minado no terminal com rich  
+Implementação do clássico jogo Campo Minado em Python, executado no terminal  
+utilizando a biblioteca Rich para renderização estilizada da interface.
 
-## Bibliotecas que serão usadas 📦:
+## Bibliotecas e recursos usados 📦:
 - time 🕑
 - random 🎲
 - rich 💰
 
-## Como testar? (Windows, cmd) ▶️?
+## Funcionalidades ✨
 
-```cmd
+- Geração dinâmica do campo
+- Proteção contra first guess
+- Sistema de flags
+- Revelação recursiva de áreas vazias
+- Interface estilizada com Rich
+
+## Como testar? ▶️?
+
+### 1. Clone o repositório e acesse o diretório
+
+```bash
 git clone https://github.com/Heitor-M33n/Campo-minado
 cd Campo-minado
+```
 
+### 2. Crie e ative um ambiente virtual
+
+```bash
 python -m venv venv
-venv\Scripts\activate.bat
+```
 
+#### Windows (cmd)
+
+```bash
+venv\Scripts\activate.bat
+```
+
+#### Linux / Mac
+
+```bash
+source venv/bin/activate
+```
+### 3. Instale as dependências e execute o main.py
+
+```bash
 pip install -r requirements.txt
 python main.py
 ```
