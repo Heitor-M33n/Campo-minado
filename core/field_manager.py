@@ -126,6 +126,10 @@ class FieldManager:
                 self.__field[y][x] = str(bombs)
 
     @property
+    def width(self) -> int:
+        return self.__width
+
+    @property
     def flagged_field(self) -> list:
         flagged_field = []
 
