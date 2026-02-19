@@ -62,12 +62,10 @@ class FieldManager:
 
                 for y, x in blank_tiles:
                     for i in range(-1, 2):
-                        if y + i in range(0, self.__width) and self.__field[y + i][x] == ' ' and ([y + i, x] not in blank_tiles):
-                            blank_tiles.append([y + i, x])
-                            appended = True
-                        elif x + i in range(0, self.__width) and self.__field[y][x + i] == ' ' and [y, x + i] not in blank_tiles:
-                            blank_tiles.append([y, x + i])
-                            appended = True
+                        for c in range(-1, 2):
+                            if y + i in range(0, self.__width) and x + c in range(0, self.__width) and self.__field[y + i][x + c] == ' ' and ([y + i, x + c] not in blank_tiles):
+                                blank_tiles.append([y + i, x + c])
+                                appended = True
 
             close_tiles = []
             for y, x in blank_tiles:
@@ -276,19 +274,21 @@ class FieldManager:
         return table
     
 def testes():
-    with console.status("Carregando...", spinner="aesthetic"):
+    with console.status('Carregando...', spinner='aesthetic'):
         fm = FieldManager()
-        fm.generate(difficulty='médio')
+        fm.generate(10, 10)
         sleep(1.3)
 
     console.rule('Minesweeper', characters='=')
     sleep(0.5)
 
+    console.print(fm._field_rich)
     console.rule('Nova rodada', characters='-')
     fm.play()
 
     while True:
-        fm.generate(difficulty='médio')
+        fm.generate(10, 10)
+        console.print(fm._field_rich)
         console.rule('Nova rodada', characters='-')
         fm.play()
 
