@@ -18,7 +18,15 @@ class FieldManager:
         self.__field = []
         self.__visible_field = []
 
-    def reveal(self, x: int, y: int) -> None:
+    def state(self) -> str:
+        """Estados: P de playing, W de won, L de lost ( o L só é retornado na função reveal )"""
+
+        if self.flagged_field == self.flagged_blanks_visible_field:
+            return 'W'
+
+        return 'P'
+
+    def reveal(self, x: int, y: int) -> str:
         """Revela o tile selecionado. Caso seja vazio, revela todos os tiles vazios e os adjacentes usando outro método."""
         y = self.__width - y
         x -= 1
@@ -30,6 +38,10 @@ class FieldManager:
             self.__blank_reveal(x, y)
         else:
             self.__reveal(x, y, False)
+            if self.__field[y][x] == 'X':
+                return 'L'
+
+        return self.state()
     
     def __blank_reveal(self, x: int, y: int) -> None:
         """Flood fill de tiles vazios. Evita index error automaticamente"""
@@ -56,7 +68,7 @@ class FieldManager:
         
         self.__visible_field[y][x] = self.__field[y][x]
 
-    def flag(self, x: int, y: int) -> None:
+    def flag(self, x: int, y: int) -> str:
         """Posiciona (ou remove, caso já tenha) uma bandeira no tile selecionado"""
         y = self.__width - y
         x -= 1
@@ -67,6 +79,8 @@ class FieldManager:
             self.__visible_field[y][x] = 'F'
         elif tile == 'F':
             self.__visible_field[y][x] = '?'
+
+        return self.state
 
     def first_guess(self, x: int, y: int) -> None:
         self.__generate_field(x, y)

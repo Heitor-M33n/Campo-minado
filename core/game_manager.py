@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from time import sleep, time
 
 from rich.console import Console
 from rich.prompt import Prompt
@@ -21,7 +22,7 @@ class GameManager():
 
     def mainloop(self):
         while True:
-            self.console.print('1. Jogar')
+            self.console.print('1. Jogar\n2. Tutorial\n3. Recordes')
 
             action = int(Prompt.ask('Insira a opção desejada', console=self.console, choices=('1', '2', '3'), show_choices=False))
 
@@ -68,15 +69,22 @@ class GameManager():
             y = int(Prompt.ask('Insira a coordenada Y', console=self.console, choices=([str(i) for i in range(1, self.fm.width + 1)]), show_choices=False))
 
             if mode.lower() == 'g':
-                self.fm.reveal(x, y)
+                state = self.fm.reveal(x, y)
             else:
-                self.fm.flag(x, y)
+                state = self.fm.flag(x, y)
 
-    def win(self):
-        pass
+            if state == 'W':
+                self.won()
+                break
+            elif state == 'L':
+                self.lost()
+                break
 
-    def lose(self):
-        pass
+    def won(self):
+        self.console.print('Você venceu!')
+
+    def lost(self):
+        self.console.print('Você perdeu...')
 
     def tutorial(self):
         pass
