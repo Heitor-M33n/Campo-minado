@@ -1,6 +1,10 @@
 from random import randrange
 
 class FieldManager:
+    """Gerenciador de campo, gera o campo e controla todas as alterações nele. Recebe coordenadas visuais sempre, e então converte para as reais.
+    (O campo não usa as coordenadas do plano cartesiano, mas é representado desse modo.)
+    """
+
     def __init__(self) -> None:
         self.clear()
 
@@ -15,20 +19,26 @@ class FieldManager:
         self.__visible_field = []
 
     def reveal(self, x: int, y: int) -> None:
+        """Revela o tile selecionado. Caso seja vazio, revela todos os tiles vazios e os adjacentes usando outro método."""
         y = self.__width - y
         x -= 1
 
-        if self.__visible_field[y][x] == 'F':
+        if self.__visible_field[y][x] != '?':
             return
-        elif self.__visible_field[y][x] != ' ':
-            self.__visible_field[y][x] = self.__field[y][x]
-
-        blank_tiles = [[y, x]]
+        
+        if self.__field[y][x] == ' ':
+            self.__blank_reveal(x, y)
+        else:
+            self.__reveal(x, y, False)
+    
+    def __blank_reveal(self, x: int, y: int) -> None:
+        """Flood fill de tiles vazios. Evita index error automaticamente"""
+        blank_tiles = [(y, x)]
         for y, x in blank_tiles:
             for i in range(-1, 2):
                 for c in range(-1, 2):
-                    if y + i in range(0, self.__width) and x + c in range(0, self.__width) and self.__field[y + i][x + c] == ' ' and ([y + i, x + c] not in blank_tiles):
-                        blank_tiles.append([y + i, x + c])
+                    if y + i in range(0, self.__width) and x + c in range(0, self.__width) and self.__field[y + i][x + c] == ' ' and ((y + i, x + c) not in blank_tiles):
+                        blank_tiles.append((y + i, x + c))
 
         close_tiles = []
         for y, x in blank_tiles:
@@ -38,9 +48,16 @@ class FieldManager:
                         close_tiles.append([y + i, x + c])
 
         for y, x in blank_tiles + close_tiles:
-            self.__visible_field[y][x] = self.__field[y][x] if self.__visible_field[y][x] != 'F' else 'F'
+            self.__reveal(x, y)
+
+    def __reveal(self, x: int, y: int, force: bool = True) -> None:
+        if self.__visible_field[y][x] == 'F' and not force:
+            return
+        
+        self.__visible_field[y][x] = self.__field[y][x]
 
     def flag(self, x: int, y: int) -> None:
+        """Posiciona (ou remove, caso já tenha) uma bandeira no tile selecionado"""
         y = self.__width - y
         x -= 1
 
