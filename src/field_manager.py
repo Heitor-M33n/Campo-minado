@@ -193,8 +193,23 @@ class FieldManager:
         return flagged_field
     
     @property
-    def render_data(self) -> dict:
-        return {'difficulty': self.__difficulty, 'width': self.__width, 'bombs': self.__bombs, 'field': self.__field, 'visible_field': self.__visible_field}
+    def flags(self) -> int:
+        flags = 0
+        
+        for row in self.__visible_field:
+            for item in row:
+                if item == 'F':
+                    flags += 1
+
+        return flags
+
+    @property
+    def visible_render_data(self) -> dict:
+        return {'difficulty': self.__difficulty, 'width': self.__width, 'bombs': self.__bombs, 'flags': self.flags, 'field': [row[:] for row in self.__visible_field]}
+    
+    @property
+    def _render_data(self) -> dict:
+        return {'difficulty': self.__difficulty, 'width': self.__width, 'bombs': self.__bombs, 'flags': 0, 'field': [row[:] for row in self.__field]}
     
     def __repr__(self) -> str:
-        return f'difficulty: {self.__difficulty}\nwidth: {self.__width}\nsize: {self.__size}\ndensity: {self.__density}\nbombs: {self.__bombs}\nbomb_chords: {self.__bomb_chords}\nfield:\n{self.__field}\nplay_field:\n{self.visible_field}'
+        return f'difficulty: {self.__difficulty}\nwidth: {self.__width}\nsize: {self.__size}\ndensity: {self.__density}\nbombs: {self.__bombs}\nbomb_chords: {self.__bomb_chords}\nfield:\n{self.__field}\nplay_field:\n{[self.__visible_field]}'
