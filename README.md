@@ -21,8 +21,9 @@ utilizando a biblioteca Rich para renderização estilizada da interface.
 
 - Cronômetro de tempo da partida
 - Recordes para cada dificuldade
-- Tutorial interativo
 - Animações de fim de jogo
+- Campos personalizados
+- Tutorial interativo
 
 ## Como testar ▶️?
 
