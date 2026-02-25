@@ -57,16 +57,14 @@ class GameManager():
         else:
             return
 
-        mode = 'g'
+        self.console.clear()
         self.tr.render_visible_field(self.fm.visible_render_data)
+        mode = 'g'
 
         x = int(Prompt.ask('Insira a coordenada X', console=self.console, choices=([str(i) for i in range(1, self.fm.width + 1)]), show_choices=False))
         y = int(Prompt.ask('Insira a coordenada Y', console=self.console, choices=([str(i) for i in range(1, self.fm.width + 1)]), show_choices=False))
 
-        self.console.print(self.fm)
         self.fm.first_guess(x, y)
-        self.console.print('\n\n\n')
-        self.console.print(self.fm)
 
         while True:
             self.console.clear()
@@ -90,11 +88,13 @@ class GameManager():
                 break
 
     def won(self):
+        self.console.clear()
         self.tr._render_field(self.fm._render_data)
         self.console.print('Você venceu!')
         sleep(5)
 
     def lost(self):
+        self.console.clear()
         self.tr.render_visible_field(self.fm.visible_render_data)
         self.console.print('Você perdeu...')
         sleep(5)
