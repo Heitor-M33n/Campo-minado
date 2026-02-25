@@ -17,7 +17,14 @@ utilizando a biblioteca Rich para renderização estilizada da interface.
 - Revelação recursiva de áreas vazias
 - Interface estilizada com Rich
 
-## Como testar? ▶️?
+### Funcionalidades que serão implementadas 🛠️:
+
+- Cronômetro de tempo da partida
+- Recordes para cada dificuldade
+- Tutorial interativo
+- Animações de fim de jogo
+
+## Como testar ▶️?
 
 ### 1. Clone o repositório e acesse o diretório
 
