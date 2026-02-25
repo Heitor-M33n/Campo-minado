@@ -53,7 +53,7 @@ class GameManager():
             self.fm.generate_basic_data(difficulty=CHART.get(diff, 'médio'))
         elif diff == 5:
             #fazer depois
-            self.fm.generate_basic_data(10, 25)
+            return
         else:
             return
 
@@ -90,13 +90,13 @@ class GameManager():
     def won(self):
         self.console.clear()
         self.tr._render_field(self.fm._render_data)
-        self.console.print('Você venceu!')
+        self.console.print('Você venceu!', style='bold green')
         sleep(5)
 
     def lost(self):
         self.console.clear()
         self.tr.render_visible_field(self.fm.visible_render_data)
-        self.console.print('Você perdeu...')
+        self.console.print('Game over!', style='bold red')
         sleep(5)
 
     def tutorial(self):

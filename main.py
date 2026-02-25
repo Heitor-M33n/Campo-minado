@@ -13,7 +13,8 @@ def main() -> None:
         fm = FieldManager()
         tr = TableRenderer(console)
         gm = GameManager(fm, tr, console)
-        
+        sleep(2)
+
     console.clear()
     gm.start()
 
